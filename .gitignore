@@ -5,6 +5,7 @@ passwd-circuit_js/
 *.ptau
 *.r1cs
 *.sym
+input.json
 public.json
 verification_key.json
 proof.json

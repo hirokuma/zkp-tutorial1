@@ -13,21 +13,28 @@
 //   "secret": "47147923612045898161641070995147120065030130353900809301484784528935861854"
 // }
 
-const circomlibjs = require("circomlibjs");
+const circomlibjs = require('circomlibjs');
+const crypto = require('crypto');
+
+/** Generate random number of specified byte length */
+const rbigint = (nbytes) => BigInt('0x' + crypto.randomBytes(nbytes).toString('hex'));
 
 (async () => {
   const pedersen = await circomlibjs.buildPedersenHash();
 
+  // 31 bytes = 248 bits
+  // const value = rbigint(31); // 何でもよいわけではない？？
   const value = 47147923612045898161641070995147120065030130353900809301484784528935861854n;
-  const msg = Buffer.from(value.toString(16).match(/.{2}/g).reverse().join(""), "hex");
+  // console.log('value: ' + value.toString(16));
+  const msg = Buffer.from(value.toString(16).match(/.{2}/g).reverse().join(''), 'hex');
 
   const hash = pedersen.hash(msg, {
-    baseHash : "blake",
+    baseHash : 'blake',
   });
 
   // BabyJubjubのY座標になっている
   const hashBigInt = BigInt(
-    "0x" + Buffer.from(hash).reverse().toString("hex")
+    '0x' + Buffer.from(hash).reverse().toString('hex')
   );
   const result = {
     secretHash: hashBigInt.toString(),
