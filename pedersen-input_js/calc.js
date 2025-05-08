@@ -13,40 +13,25 @@
 //   "secret": "47147923612045898161641070995147120065030130353900809301484784528935861854"
 // }
 
+const circomlibjs = require("circomlibjs");
 
-// tornadocach/circomlib を使っている
-const circomlib = require("circomlib");
+(async () => {
+  const pedersen = await circomlibjs.buildPedersenHash();
 
-const input =
-  47147923612045898161641070995147120065030130353900809301484784528935861854n;
+  const value = 47147923612045898161641070995147120065030130353900809301484784528935861854n;
+  const msg = Buffer.from(value.toString(16).match(/.{2}/g).reverse().join(""), "hex");
 
-/** Compute pedersen hash */
-const pedersenHash = (data) =>
-  // [0]X, [1]Y
-  circomlib.babyJub.unpackPoint(circomlib.pedersenHash.hash(data))[1];
+  const hash = pedersen.hash(msg, {
+    baseHash : "blake",
+  });
 
-const main = () => {
-  const inputLen = Math.ceil(input.toString(16).length / 2);
-  const msg = input.leInt2Buff(inputLen);
-  const hash = pedersenHash(msg);
+  // BabyJubjubのY座標になっている
+  const hashBigInt = BigInt(
+    "0x" + Buffer.from(hash).reverse().toString("hex")
+  );
   const result = {
-    secret: input.toString(),
-    secretHash: hash.toString(),
+    secretHash: hashBigInt.toString(),
+    secret: value.toString(),
   };
-
-  const h = circomlib.pedersenHash.hash(msg);
-  console.log('h: ' + h.toString('hex'));
-  const point = circomlib.babyJub.unpackPoint(h);
-  console.log('point: ' + point);
-
-  console.log('inputLen = ' + inputLen);
-  console.log('input: 0x' + input.toString(16));
-  console.log('msg:   0x' + msg.toString('hex'));
-  console.log('hash:  0x' + hash.toString(16));
   console.log(JSON.stringify(result, null, 2));
-
-  const hashLen = Math.ceil(hash.toString(16).length / 2);
-  console.log('hashLen = ' + hashLen);
-};
-
-main();
+})();
