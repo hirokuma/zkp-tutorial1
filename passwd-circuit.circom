@@ -16,7 +16,7 @@ template SecretHasher() {
         secretHasher.in[i] <== secretBits.out[i];
     }
 
-    secretHash <== secretHasher.out[0];
+    secretHash <== secretHasher.out[1];
 }
 
 template Main() {
