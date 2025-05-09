@@ -5,6 +5,17 @@ echo '== Part2: Phase 2 =='
 echo '===================='
 echo
 
+# check
+which circom > /dev/null
+if [ "$?" -ne 0 ]; then
+    echo "Please install circom: https://docs.circom.io/getting-started/installation/#installing-circom"
+    exit 1
+fi
+
+# clean
+rm -rf passwd-circuit_js
+rm -f circuit_*.zkey passwd-circuit.r1cs passwd-circuit.sym verification_key.json
+
 # compile circuit
 
 circom passwd-circuit.circom --r1cs --wasm --sym
