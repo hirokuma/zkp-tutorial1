@@ -17,16 +17,27 @@ rm -rf passwd-circuit_js
 rm -f circuit_*.zkey passwd-circuit.r1cs passwd-circuit.sym verification_key.json
 
 # compile circuit
-
 circom passwd-circuit.circom --r1cs --wasm --sym
+
+# view information
+npx snarkjs r1cs info passwd-circuit.r1cs
 
 
 # phase 2
+
+# setup
 npx snarkjs groth16 setup passwd-circuit.r1cs pot14_final.ptau circuit_0000.zkey
+
+# contribute to the Phase 2 ceremony
 npx snarkjs zkey contribute circuit_0000.zkey circuit_0001.zkey --name="1st Contributor Name" -v -e="random text 1"
+
+# apply random beacon
 npx snarkjs zkey beacon circuit_0001.zkey circuit_final.zkey 0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f 10 -n="Final Beacon phase2"
 
-# export
+# verify the final zkey
+npx snarkjs zkey verify passwd-circuit.r1cs pot14_final.ptau circuit_0001.zkey
+
+# export the verification key
 npx snarkjs zkey export verificationkey circuit_final.zkey verification_key.json
 
 echo

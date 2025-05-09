@@ -11,8 +11,10 @@ rm -f input.json proof.json public.json witness.wtns
 # input file
 node pedersen-input_js/calc.js > input.json
 
-# create proof
+# create witness
 node passwd-circuit_js/generate_witness.js passwd-circuit_js/passwd-circuit.wasm input.json witness.wtns
+
+# create proof
 npx snarkjs groth16 prove circuit_final.zkey witness.wtns proof.json public.json
 
 

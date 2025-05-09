@@ -10,3 +10,4 @@ public.json
 verification_key.json
 proof.json
 witness.wtns
+verifier.sol
