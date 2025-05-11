@@ -23,22 +23,16 @@ const rbigint = (nbytes) => BigInt('0x' + crypto.randomBytes(nbytes).toString('h
   const pedersen = await circomlibjs.buildPedersenHash();
 
   // 31 bytes = 248 bits
-  const value = rbigint(31); // 値によっては期待と異なるハッシュ値になることがある。原因不明。
-  // const value = 47147923612045898161641070995147120065030130353900809301484784528935861854n;
-  // console.log('value: ' + value.toString(16));
-  const msg = Buffer.from(value.toString(16).match(/.{2}/g).reverse().join(''), 'hex');
+  const inputLen = 31;
+  const v = rbigint(inputLen);
+  // const v = 47147923612045898161641070995147120065030130353900809301484784528935861854n;
 
-  const hash = pedersen.hash(msg, {
-    baseHash : 'blake',
-  });
-
-  // BabyJubjubのY座標になっている
-  const hashBigInt = BigInt(
-    '0x' + Buffer.from(hash).reverse().toString('hex')
-  );
+  const msg = Buffer.from(v.toString(16), 'hex').reverse();
+  const hash = pedersen.hash(msg);
+  const hashPoint = pedersen.babyJub.unpackPoint(hash);
   const result = {
-    secretHash: hashBigInt.toString(),
-    secret: value.toString(),
+    secretHash: pedersen.babyJub.F.toString(hashPoint[1]),
+    secret: v.toString(),
   };
   console.log(JSON.stringify(result, null, 2));
 })();

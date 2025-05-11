@@ -13,48 +13,26 @@
 //   "secret": "47147923612045898161641070995147120065030130353900809301484784528935861854"
 // }
 
-
 // tornadocach/circomlib を使っている
 const circomlib = require("circomlib");
 const crypto = require('crypto');
 
-const input =
-//  47147923612045898161641070995147120065030130353900809301484784528935861854n;
-  215639607065785049144943613156164690545709108427768513382832754285184579360n;
-
+/** Generate random number of specified byte length */
 const rbigint = (nbytes) => BigInt('0x' + crypto.randomBytes(nbytes).toString('hex'));
 
+(async () => {
+  // 31 bytes = 248 bits
+  const inputLen = 31;
+  const v = rbigint(inputLen);
+  // const v = 47147923612045898161641070995147120065030130353900809301484784528935861854n;
 
-/** Compute pedersen hash */
-const pedersenHash = (data) =>
-  // [0]X, [1]Y
-  circomlib.babyJub.unpackPoint(circomlib.pedersenHash.hash(data))[1];
-
-const main = () => {
-  const inputLen = Math.ceil(input.toString(16).length / 2);
-  //const v = rbigint(31);
-  const v = input;
   const msg = v.leInt2Buff(inputLen);
-  const hash = pedersenHash(msg);
+  // const hash = pedersenHash(msg);
+  const hash = circomlib.pedersenHash.hash(msg);
+  const hashPoint = circomlib.babyJub.unpackPoint(hash);
   const result = {
-    secretHash: hash.toString(),
+    secretHash: hashPoint[1].toString(),
     secret: v.toString(),
   };
-
-  // const h = circomlib.pedersenHash.hash(msg);
-  // console.log('h: ' + h.toString('hex'));
-  // const point = circomlib.babyJub.unpackPoint(h);
-  // console.log('point: ' + point);
-
-  // console.log('inputLen = ' + inputLen);
-  // console.log('input: 0x' + input.toString(16));
-  // console.log('msg:   0x' + msg.toString('hex'));
-  // console.log('hash:  0x' + hash.toString(16));
   console.log(JSON.stringify(result, null, 2));
-
-  // const hashLen = Math.ceil(hash.toString(16).length / 2);
-  // console.log('hashLen = ' + hashLen);
-};
-
-main();
-
+})();
